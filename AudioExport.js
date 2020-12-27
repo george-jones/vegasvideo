@@ -56,11 +56,14 @@ function AudioExport() {
 			clip = {
 				"clip_type": m.Label,
 				"start": m.Position,
-				"start_millis": Math.floor(m.Position.Nanos / 10000)
+				"start_millis": Math.floor(m.Position.Nanos / 10000),
+				"end_millis": -1
 			};
-		} else {
+		} else if (clip.end_millis == -1) {
 			clip.end = m.Position;
 			clip.end_millis = Math.floor(m.Position.Nanos / 10000)
+		} else {
+			clip.ask_time = Math.floor(m.Position.Nanos / 10000);
 			clips.push(clip);
 			clip = null;
 		}
@@ -90,8 +93,11 @@ function AudioExport() {
 		clip = clips[i];
 		filename = (pad + i).slice(-pad.length) + '.mp3';
 		Vegas.Render(dest + filename, t, clip.start, clip.end - clip.start);
-		f.WriteLine('\t{ "filename": "' + filename + ' "type": "' + clip.clip_type +
-			'", "start": ' + clip.start_millis + ', "end": ' + clip.end_millis +
+		f.WriteLine('\t{ "filename": "' + filename +
+			'", "type": "' + clip.clip_type +
+			'", "start": ' + clip.start_millis +
+			', "end": ' + clip.end_millis +
+			', "ask_time": ' + clip.ask_time +
 			', "options": [ "", "", "", "" ] }' + comma);
 	}
 	f.WriteLine('] }');
